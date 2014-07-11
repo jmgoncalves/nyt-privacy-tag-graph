@@ -1,0 +1,19 @@
+.node circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font-family: Helvetica;
+  color: #000;
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
