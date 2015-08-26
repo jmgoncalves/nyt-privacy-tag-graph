@@ -6,9 +6,9 @@ var color = d3.scale.category20();
 var force = d3.layout.force()
     .charge(function(d) { return -d.size*10 })
     .linkStrength(function(d) { return d.value/100; })
-    .linkDistance(function(d) { 
-      return 600/Math.sqrt(d.value) 
-      + Math.sqrt(d.source.size) 
+    .linkDistance(function(d) {
+      return 600/Math.sqrt(d.value)
+      + Math.sqrt(d.source.size)
       + Math.sqrt(d.target.size);
     })
     .size([width, height]);
@@ -17,9 +17,15 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("nyt.json", function(error, graph) {
+var numNodes = 0;
+
+d3.json("nyt2015.json", function(error, graph) {
   if (graph === undefined)
     console.log(error);
+
+console.log(graph.nodes)
+console.log(graph.links)
+numNodes = graph.nodes.length;
 
   force
       .nodes(graph.nodes)
@@ -40,11 +46,21 @@ d3.json("nyt.json", function(error, graph) {
       .call(force.drag);
 
   node.append("circle")
-      .attr("r", function(d) { return Math.sqrt(d.size)*2; })
+      .attr("r", function(d) {
+        if (d.weight>0) // only draw if has positive weight (number of links)
+          return Math.sqrt(d.size)*2;
+        else
+          return 0;
+        })
       .style("fill", function(d) { return rbgFromHue(dToHue(d)); });
 
   var txt = node.append("text")
-      .attr("font-size", function(d) { return Math.log(d.size)*3; })
+      .attr("font-size", function(d) { // only draw if has positive weight (number of links)
+        if (d.weight>0)
+          return Math.log(d.size)*3;
+        else
+          return 0;
+        })
       .attr("fill", function(d) { return rbgFromHue(dToHue(d)); })
       .text(function(d) { return d.name; })
       .call(wrap);
@@ -101,7 +117,7 @@ function rbgFromHue(hue) {
   //hue += goldenRatioConjugate;
   //hue %= 1;
   //hue = Math.random();
-  
+
   // convert to RGB
   var h_i = Math.floor(hue*6);
   var f = hue*6 - h_i;
@@ -111,32 +127,32 @@ function rbgFromHue(hue) {
   var r, g, b;
 
   switch (h_i) {
-    case 0: 
+    case 0:
       r = lightness;
       g = t;
       b = p;
       break;
-    case 1: 
+    case 1:
       r = q;
       g = lightness;
       b = p;
       break;
-    case 2: 
+    case 2:
       r = p;
       g = lightness;
       b = t;
       break;
-    case 3: 
+    case 3:
       r = p;
       g = q;
       b = lightness;
       break;
-    case 4: 
+    case 4:
       r = t;
       g = p;
       b = lightness;
       break;
-    case 5: 
+    case 5:
       r = lightness;
       g = p;
       b = q;
@@ -150,7 +166,7 @@ function dToHue(d) {
   //console.log(d);
   //console.log("index:"+d.index+" hue:"+(goldenRatioConjugate*d.index)%1);
   //console.log("index:"+d.index+" hue:"+(d.index/101));
-  return (d.index/101);
+  return (d.index/numNodes);
   //return (d.x+d.y+(d.weight/1000))%1;
 }
 
